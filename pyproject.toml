@@ -1,0 +1,55 @@
+[project]
+name = "indusnlp"
+version = "2.0.0"
+description = "IndusNLP - Hindi/Indic NLP toolkit with OCR, text cleaning, and Q&A generation"
+readme = "README.md"
+requires-python = ">=3.9,<3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "IndusNLP Team"}
+]
+keywords = ["nlp", "hindi", "indic", "ocr", "text-cleaning", "qa-generation"]
+
+dependencies = [
+    "flask>=3.0.0",
+    "python-dotenv>=1.0.0",
+    "lxml>=5.0.0",
+    "ai4bharat-transliteration>=1.1.0",
+    "indicnlp>=0.0.1",
+    "indic-nlp-library>=0.92",
+    "mistralai>=1.0.0",
+    "google-generativeai>=0.8.0",
+    "gunicorn>=21.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "black>=24.0.0",
+    "ruff>=0.5.0",
+]
+
+[project.scripts]
+indusnlp-server = "indusnlp.app:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["indusnlp", "filters"]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.0.0",
+    "black>=24.0.0",
+    "ruff>=0.5.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.black]
+line-length = 100
+target-version = ["py39"]
