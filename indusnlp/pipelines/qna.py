@@ -52,20 +52,30 @@ class QnAPipeline:
         if not raw:
             return None
 
+        # ✅ FIXED: Proper regex pattern
         raw = re.sub(r"``````", "", raw.strip())
+        print(f"🔍 Raw after cleaning: {repr(raw[:200])}...")  # Debug
+        
         start, end = raw.find("["), raw.rfind("]") + 1
         if start == -1 or end <= 0:
+            print(f"❌ No JSON array found in: {repr(raw[:100])}")
             return None
 
         text = raw[start:end]
         
         try:
-            return json.loads(text)
+            result = json.loads(text)
+            if not isinstance(result, list):
+                print(f"❌ Expected list, got: {type(result)}")
+                return None
+            print(f"✅ Parsed {len(result)} Q&A items")
+            return result
         except json.JSONDecodeError as e:
             print(f"JSON parse error: {e}")
+            print(f"Failed text: {repr(text[:100])}")
             return None
     
-    def _generate_batch(self, text: str, seen: set) -> Optional[List[Dict]]:
+    def _generate_batch(self, text: str, seen: set[str]) -> Optional[List[Dict]]:
         """Generate a single batch of Q&A pairs."""
         import google.generativeai as genai
         
@@ -151,8 +161,8 @@ Text:
         if not text or not text.strip():
             raise ValueError("Input text is empty or contains only whitespace.")
         
-        all_qna = []
-        seen = set()
+        all_qna: List[Dict] = []
+        seen: set[str] = set()
         num_batches = math.ceil(num_questions / batch_size)
         
         for batch in range(1, num_batches + 1):
@@ -177,8 +187,12 @@ Text:
                 print(f"⚠️ Batch {batch}: Failed after {max_retries} retries.")
                 continue
             
-            # Filter duplicates
+            # Filter duplicates - ✅ ADDED TYPE CHECK
             for item in qna_data:
+                if not isinstance(item, dict):  # ✅ Safety check
+                    print(f"⚠️ Skipping non-dict item: {type(item)}")
+                    continue
+                    
                 q = item.get("question", "").strip()
                 if not q:
                     continue
@@ -337,6 +351,7 @@ Text:
         
         return results
 
+
 # Module-level convenience function
 def generate_qna(text: str, num_questions: int = 25, api_key: Optional[str] = None) -> List[Dict]:
     """
@@ -352,6 +367,7 @@ def generate_qna(text: str, num_questions: int = 25, api_key: Optional[str] = No
     """
     pipeline = QnAPipeline(api_key=api_key)
     return pipeline.generate_qna(text, num_questions)
+
 
 if __name__ == "__main__":
     import argparse
