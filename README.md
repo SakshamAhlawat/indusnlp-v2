@@ -51,11 +51,13 @@ pip install -e .
 ### Configuration
 
 1. Copy the example environment file:
+
 ```bash
 cp .env.example .env
 ```
 
-2. Edit `.env` and add your API keys:
+1. Edit `.env` and add your API keys:
+
 ```
 MISTRAL_API_KEY=your_mistral_api_key
 GEMINI_API_KEY=your_gemini_api_key
@@ -109,10 +111,12 @@ POST /api/ocr
 Extract text from PDF files using Mistral OCR.
 
 **Request:**
+
 - Content-Type: `multipart/form-data`
 - Body: `file` - PDF or ZIP file containing PDFs
 
 **Response (single PDF):**
+
 ```json
 {
   "success": true,
@@ -124,6 +128,7 @@ Extract text from PDF files using Mistral OCR.
 **Response (ZIP):** Returns a ZIP file containing `.txt` files
 
 **Example:**
+
 ```bash
 curl -X POST -F "file=@document.pdf" http://localhost:5000/api/ocr
 ```
@@ -141,6 +146,7 @@ Clean Hindi/Indic text with optional transliteration.
 **Request Options:**
 
 1. **JSON Body:**
+
 ```json
 {
   "text": "Your text to clean...",
@@ -150,16 +156,19 @@ Clean Hindi/Indic text with optional transliteration.
 }
 ```
 
-2. **File Upload:**
+1. **File Upload:**
+
 - Content-Type: `multipart/form-data`
 - Body: `file` - TXT or ZIP file
 
 **Query Parameters:**
+
 - `transliterate` (bool, default: false) - Enable English to Hindi transliteration
 - `filter_badwords` (bool, default: true) - Filter profanity
 - `filter_punctuation` (bool, default: false) - Keep only punctuated lines
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -170,6 +179,7 @@ Clean Hindi/Indic text with optional transliteration.
 ```
 
 **Example:**
+
 ```bash
 # JSON request
 curl -X POST http://localhost:5000/api/clean \
@@ -193,6 +203,7 @@ Generate educational Q&A pairs from text using Google Gemini.
 **Request Options:**
 
 1. **JSON Body:**
+
 ```json
 {
   "text": "Your educational text...",
@@ -201,15 +212,18 @@ Generate educational Q&A pairs from text using Google Gemini.
 }
 ```
 
-2. **File Upload:**
+1. **File Upload:**
+
 - Content-Type: `multipart/form-data`
 - Body: `file` - TXT or ZIP file
 
 **Query Parameters:**
+
 - `num_questions` (int, default: 25) - Number of questions to generate
 - `batch_size` (int, default: 25) - Questions per API call
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -232,6 +246,7 @@ Generate educational Q&A pairs from text using Google Gemini.
 ```
 
 **Example:**
+
 ```bash
 curl -X POST http://localhost:5000/api/qna \
   -H "Content-Type: application/json" \
@@ -277,6 +292,7 @@ Key dependencies (managed via `pyproject.toml`):
 The old `indictrans` library has been replaced with `ai4bharat-transliteration`:
 
 **Before (v1):**
+
 ```python
 from indictrans import Transliterator
 transliterator = Transliterator(source='eng', target='hin')
@@ -284,6 +300,7 @@ result = transliterator.transform("hello")
 ```
 
 **After (v2):**
+
 ```python
 from ai4bharat.transliteration import XlitEngine
 transliterator = XlitEngine("hi", beam_width=4, rescore=True)
