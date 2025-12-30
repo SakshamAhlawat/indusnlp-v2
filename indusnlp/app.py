@@ -12,6 +12,7 @@ from pathlib import Path
 from functools import wraps
 
 from flask import Flask, request, jsonify, send_file
+from werkzeug.exceptions import HTTPException  # ✅ added
 from dotenv import load_dotenv
 
 # Add parent directory to path for imports
@@ -41,7 +42,11 @@ def handle_errors(f):
     def decorated_function(*args, **kwargs):
         try:
             return f(*args, **kwargs)
+        except HTTPException as e:
+            # ✅ Preserve HTTPException status codes (e.g., abort(400))
+            return jsonify({"success": False, "error": e.description}), e.code
         except Exception as e:
+            # Fallback: internal server error
             return jsonify({"success": False, "error": str(e)}), 500
     return decorated_function
 
